@@ -1,0 +1,31 @@
+name: WorkBuddy Daily Checkin
+
+on:
+  schedule:
+    - cron: "0 1 * * *"   # UTC 01:00 = 北京时间 09:00
+  workflow_dispatch: {}    # 允许在 GitHub 网页手动触发
+
+permissions: {}
+
+jobs:
+  checkin:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: pip install requests
+
+      - name: Run checkin
+        env:
+          WORKBUDDY_ACCOUNTS: ${{ secrets.WORKBUDDY_ACCOUNTS }}
+          PUSHPLUS_TOKEN: ${{ secrets.PUSHPLUS_TOKEN }}
+          SERVERCHAN_KEY: ${{ secrets.SERVERCHAN_KEY }}
+        run: python daily_checkin.py
